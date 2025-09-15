@@ -16,25 +16,49 @@ const Login = () => {
   };
 
   return (
-    <>
-      <h2 className="text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div className="rounded-md shadow-sm -space-y-px">
-          <div>
-            <input id="username" name="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Username"/>
-          </div>
-          <div>
-            <input id="password" name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Password"/>
-          </div>
-        </div>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <div>
-          <button type="submit" className="px-6 py-3 bg-indigo-600 text-white font-semibold cursor-pointer rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 transition-colors" disabled={isLoading}>
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </div>
-      </form>
-    </>
+<>
+  <h2 className="text-center text-2xl font-semibold text-gray-900">POS System</h2>
+
+  <form
+    className="mt-8 mx-auto max-w-xs space-y-4"
+    onSubmit={handleSubmit}
+  >
+    <div className="space-y-3">
+      <input
+        id="username"
+        name="username"
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        required
+        placeholder="Username"
+        className="w-full px-3 py-2 border-0 border-b border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:border-black"
+      />
+      <input
+        id="password"
+        name="password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        placeholder="Password"
+        className="w-full px-3 py-2 border-0 border-b border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:border-black"
+      />
+    </div>
+
+    {error && <p className="text-sm text-red-600">{error}</p>}
+
+    <div className="flex justify-center">
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="px-6 py-2 text-sm font-medium text-white bg-black disabled:bg-gray-300"
+      >
+        {isLoading ? 'Signing in…' : 'Sign in'}
+      </button>
+    </div>
+  </form>
+</>
   );
 };
 
