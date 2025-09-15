@@ -63,7 +63,13 @@ export const useAuthStore = create<AuthState>()(
           );
           const { access, refresh } = response.data;
 
-          get().setTokens({ accessToken: access, refreshToken: refresh });
+          // set the tokens and authentication status
+          set({
+            accessToken: access,
+            refreshToken: refresh,
+            isAuthenticated: true,
+          });
+
           await get().fetchSelf();
 
           const username = get().user?.username;
@@ -86,6 +92,10 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           error: null,
         });
+        // Optional: clear any stored tokens
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
         toast.success("Logged out successfully.");
       },
 
