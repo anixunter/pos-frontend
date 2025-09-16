@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"] // Maps '@/*' to 'src/*'
+      "@/*": ["./src/*"] // Maps '@/*' to 'src/*'
     },
 
     /* Bundler mode */
