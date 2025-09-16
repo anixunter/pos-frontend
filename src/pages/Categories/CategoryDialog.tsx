@@ -14,46 +14,61 @@ import { useCategoryStore } from "@/stores/categoryStore"
 import type { Category } from "@/pages/Categories/Categories" // category type
 import { useEffect, useState } from "react"
 
-interface EditCategoryDialogProps {
+type DialogMode = "create" | "edit"
+
+interface CategoryDialogProps {
+  mode: DialogMode
   category: Category | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
 }
 
-export function EditCategoryDialog({
+export function CategoryDialog({
+  mode,
   category,
   open,
   onOpenChange,
   onSuccess,
-}: EditCategoryDialogProps){
+}: CategoryDialogProps){
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const {updateCategory} = useCategoryStore()
+  const {updateCategory, createCategory} = useCategoryStore()
 
-  // Reset form whenever dialog opens OR category changes
+  // Reset form when dialog opens or mode/category changes
   useEffect(() => {
-    if (open && category) {
-      setName(category.name)
-      setDescription(category.description || "")
+    if (open) {
+      if (mode === "edit" && category) {
+        setName(category.name)
+        setDescription(category.description || "")
+      } else {
+        // create mode — start fresh
+        setName("")
+        setDescription("")
+      }
     }
-    // Optional: Reset when dialog closes (cleanup)
     if (!open) {
       setName("")
       setDescription("")
     }
-  }, [open, category]) // ← Key: depends on both open and category
+  }, [open, mode, category])
+
+  const isEdit = mode === "edit"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!category) return
 
     try {
+      if (isEdit && category){
       await updateCategory(category.id, {name, description})
+      } else {
+        await createCategory({name, description})
+      }
+
       onSuccess?.()
-      onOpenChange(false) // close after success
+      onOpenChange(false)
     } catch (error){
-      console.error("Failed to update category", error)
+      console.error(`Failed to ${isEdit ? "update" : "create"} category`, error)
       // optionally show toast
     }
   }
@@ -62,9 +77,13 @@ export function EditCategoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Edit Category</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Category" : "Add New Category"}
+          </DialogTitle>
           <DialogDescription>
-            Update the category details below.
+            {isEdit
+              ? "Update the category details below."
+              : "Fill in the details to create a new category."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

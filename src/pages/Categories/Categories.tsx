@@ -2,8 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { useState, useEffect } from "react"
 import { useCategoryStore } from "@/stores/categoryStore";
 import { DataTable } from "@/components/ui/data-table";
-import { MoreHorizontal } from "lucide-react"
-import { ArrowUpDown } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,13 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { EditCategoryDialog } from "./EditCategoryDialog";
+import { CategoryDialog } from "./CategoryDialog";
 
 export type Category = {
   id: string;
   name: string;
   description: string;
 }
+
+type DialogMode = "create" | "edit"
 
 const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category>[] => [
   {
@@ -64,6 +65,7 @@ const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category
 const Categories = () => {
   const {categories, isLoading, error, fetchCategories } = useCategoryStore();
 
+  const [dialogMode, setDialogMode] = useState<DialogMode>("edit")
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -72,7 +74,14 @@ const Categories = () => {
   }, []);
 
   const handleEdit = (category: Category) => {
+    setDialogMode("edit")
     setEditingCategory(category)
+    setIsDialogOpen(true)
+  }
+
+  const handleCreate = () => {
+    setDialogMode("create")
+    setEditingCategory(null)
     setIsDialogOpen(true)
   }
 
@@ -90,9 +99,15 @@ const Categories = () => {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Categories Management</h2>
+      <Button onClick={handleCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Category
+        </Button>
       <div className="container mx-auto py-10">
         <DataTable columns={columns} data={categories} />
-        <EditCategoryDialog
+        <CategoryDialog
+        key={dialogMode === "edit" ? editingCategory?.id : "new"} // 👈 forces remount on mode/category change
+        mode={dialogMode}
         category={editingCategory}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
