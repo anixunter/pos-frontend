@@ -3,6 +3,7 @@ import { useEffect } from "react"
 import { useCategoryStore } from "@/stores/categoryStore";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,7 +21,17 @@ export type Category = {
 export const columns: ColumnDef<Category>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "description",
