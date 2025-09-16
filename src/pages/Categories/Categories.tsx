@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useCategoryStore } from "@/stores/categoryStore";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react"
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { EditCategoryDialog } from "./EditCategoryDialog";
 
 export type Category = {
   id: string;
@@ -18,7 +19,7 @@ export type Category = {
   description: string;
 }
 
-export const columns: ColumnDef<Category>[] = [
+const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -52,7 +53,7 @@ export const columns: ColumnDef<Category>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(category.id)}>Copy Id</DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>handleEdit(category)}>Edit</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -63,9 +64,25 @@ export const columns: ColumnDef<Category>[] = [
 const Categories = () => {
   const {categories, isLoading, error, fetchCategories } = useCategoryStore();
 
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   useEffect(()=>{
     fetchCategories();
   }, []);
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category)
+    setIsDialogOpen(true)
+  }
+
+  const handleDialogSuccess = () => {
+    setEditingCategory(null)
+    // Optionally: refetch categories if needed
+    // fetchCategories()
+  }
+
+  const columns = getColumns(handleEdit)
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -75,6 +92,12 @@ const Categories = () => {
       <h2 className="text-2xl font-semibold mb-4">Categories Management</h2>
       <div className="container mx-auto py-10">
         <DataTable columns={columns} data={categories} />
+        <EditCategoryDialog
+        category={editingCategory}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSuccess={handleDialogSuccess}
+      />
       </div>
     </div>
   );
