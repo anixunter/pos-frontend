@@ -11,7 +11,7 @@ import Deposits from '@/pages/Deposits';
 import InventoryAdjustment from '@/pages/InventoryAdjustment';
 import PurchaseOrders from '@/pages/PurchaseOrders';
 import Products from '@/pages/Products';
-import Suppliers from '@/pages/Suppliers';
+import Suppliers from '@/pages/Suppliers/Suppliers';
 import Categories from '@/pages/Categories/Categories';
 import NotFound from "./pages/NotFound";
 

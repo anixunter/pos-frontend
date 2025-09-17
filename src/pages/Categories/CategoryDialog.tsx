@@ -47,10 +47,6 @@ export function CategoryDialog({
         setDescription("")
       }
     }
-    if (!open) {
-      setName("")
-      setDescription("")
-    }
   }, [open, mode, category])
 
   const isEdit = mode === "edit"

@@ -85,6 +85,12 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
+  const handleCreate = () => {
+    setDialogMode("create")
+    // setEditingCategory(null)
+    setIsDialogOpen(true)
+  }
+
   const handleEdit = (category: Category) => {
     setDialogMode("edit")
     setEditingCategory(category)
@@ -111,13 +117,6 @@ const Categories = () => {
     }
   }
 
-  const handleCreate = () => {
-    setDialogMode("create")
-    setEditingCategory(null)
-    setIsDialogOpen(true)
-  }
-
-
   const handleDialogSuccess = () => {
     setEditingCategory(null)
     // Optionally: refetch categories if needed
@@ -135,7 +134,7 @@ const Categories = () => {
       <div className="container mx-auto py-10">
         <DataTable columns={columns} data={categories} onCreate={handleCreate}/>
         <CategoryDialog
-        key={dialogMode === "edit" ? editingCategory?.id : "new"} // 👈 forces remount on mode/category change
+        key={isDialogOpen ? (dialogMode === "edit" ? editingCategory?.id || "edit" : "create") : "closed"}
         mode={dialogMode}
         category={editingCategory}
         open={isDialogOpen}
