@@ -123,11 +123,8 @@ const Suppliers = () => {
 
     try {
       await deleteSupplier(deletingSupplier.id); // ← your store function
-      // Optionally show toast
-      // toast({ title: "Supplier deleted", description: `${deletingSupplier.name} has been removed.` })
     } catch (error) {
       console.error("Failed to delete supplier", error);
-      // toast({ title: "Error", description: "Failed to delete supplier.", variant: "destructive" })
     } finally {
       setIsDeleteDialogOpen(false);
       setDeletingSupplier(null);

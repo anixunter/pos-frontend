@@ -3,7 +3,7 @@ import apiClient from "@/services/apiClient";
 import { apiEndpoints } from "@/services/apiEndpoints";
 import { toast } from "react-hot-toast";
 
-interface Category {
+export interface Category {
   id: string;
   name: string;
   description: string;

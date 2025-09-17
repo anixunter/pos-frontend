@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,22 +6,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useCategoryStore } from "@/stores/categoryStore"
-import type { Category } from "@/pages/Categories/Categories" // category type
-import { useEffect, useState } from "react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useCategoryStore } from "@/stores/categoryStore";
+import type { Category } from "@/stores/categoryStore";
+import { useEffect, useState } from "react";
 
-type DialogMode = "create" | "edit"
+type DialogMode = "create" | "edit";
 
 interface CategoryDialogProps {
-  mode: DialogMode
-  category: Category | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  mode: DialogMode;
+  category: Category | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function CategoryDialog({
@@ -30,44 +30,47 @@ export function CategoryDialog({
   open,
   onOpenChange,
   onSuccess,
-}: CategoryDialogProps){
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const {createCategory, updateCategory} = useCategoryStore()
+}: CategoryDialogProps) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const { createCategory, updateCategory } = useCategoryStore();
 
   // Reset form when dialog opens or mode/category changes
   useEffect(() => {
     if (open) {
       if (mode === "edit" && category) {
-        setName(category.name)
-        setDescription(category.description || "")
+        setName(category.name);
+        setDescription(category.description || "");
       } else {
         // create mode — start fresh
-        setName("")
-        setDescription("")
+        setName("");
+        setDescription("");
       }
     }
-  }, [open, mode, category])
+  }, [open, mode, category]);
 
-  const isEdit = mode === "edit"
+  const isEdit = mode === "edit";
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      if (isEdit && category){
-      await updateCategory(category.id, {name, description})
+      if (isEdit && category) {
+        await updateCategory(category.id, { name, description });
       } else {
-        await createCategory({name, description})
+        await createCategory({ name, description });
       }
 
-      onSuccess?.()
-      onOpenChange(false)
-    } catch (error){
-      console.error(`Failed to ${isEdit ? "update" : "create"} category`, error)
-      // optionally show toast
+      onSuccess?.();
+      onOpenChange(false);
+    } catch (error) {
+      console.error(
+        `Failed to ${isEdit ? "update" : "create"} category`,
+        error
+      );
+      // toast is already shown from stores
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,6 +117,5 @@ export function CategoryDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

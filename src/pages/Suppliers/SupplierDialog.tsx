@@ -83,7 +83,7 @@ export function SupplierDialog({
         `Failed to ${isEdit ? "update" : "create"} supplier`,
         error
       );
-      // optionally show toast
+      // toast is already shown from stores
     }
   };
 
