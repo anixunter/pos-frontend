@@ -33,7 +33,7 @@ export function CategoryDialog({
 }: CategoryDialogProps){
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const {updateCategory, createCategory} = useCategoryStore()
+  const {createCategory, updateCategory} = useCategoryStore()
 
   // Reset form when dialog opens or mode/category changes
   useEffect(() => {
