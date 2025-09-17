@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { useState, useEffect } from "react"
 import { useCategoryStore } from "@/stores/categoryStore";
 import { DataTable } from "@/components/ui/data-table";
-import { MoreHorizontal, ArrowUpDown, Plus } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { CategoryDialog } from "./CategoryDialog";
 
 export type Category = {
@@ -20,7 +30,7 @@ export type Category = {
 
 type DialogMode = "create" | "edit"
 
-const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category>[] => [
+const getColumns = (handleEdit: (category: Category)=> void, handleDelete: (category: Category)=> void): ColumnDef<Category>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -53,8 +63,8 @@ const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(category.id)}>Copy Id</DropdownMenuItem>
             <DropdownMenuItem onClick={()=>handleEdit(category)}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDelete(category)}>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -63,11 +73,13 @@ const getColumns = (handleEdit: (category: Category)=> void): ColumnDef<Category
 ]
 
 const Categories = () => {
-  const {categories, isLoading, error, fetchCategories } = useCategoryStore();
+  const {categories, isLoading, error, fetchCategories, deleteCategory } = useCategoryStore();
 
   const [dialogMode, setDialogMode] = useState<DialogMode>("edit")
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   useEffect(()=>{
     fetchCategories();
@@ -79,11 +91,32 @@ const Categories = () => {
     setIsDialogOpen(true)
   }
 
+  const handleDelete = (category: Category) => {
+    setDeletingCategory(category)
+    setIsDeleteDialogOpen(true)
+  }
+  const confirmDelete = async () => {
+    if (!deletingCategory) return
+
+    try {
+      await deleteCategory(deletingCategory.id) // ← your store function
+      // Optionally show toast
+      // toast({ title: "Category deleted", description: `${deletingCategory.name} has been removed.` })
+    } catch (error) {
+      console.error("Failed to delete category", error)
+      // toast({ title: "Error", description: "Failed to delete category.", variant: "destructive" })
+    } finally {
+      setIsDeleteDialogOpen(false)
+      setDeletingCategory(null)
+    }
+  }
+
   const handleCreate = () => {
     setDialogMode("create")
     setEditingCategory(null)
     setIsDialogOpen(true)
   }
+
 
   const handleDialogSuccess = () => {
     setEditingCategory(null)
@@ -91,7 +124,7 @@ const Categories = () => {
     // fetchCategories()
   }
 
-  const columns = getColumns(handleEdit)
+  const columns = getColumns(handleEdit, handleDelete)
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -99,12 +132,8 @@ const Categories = () => {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Categories Management</h2>
-      <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Category
-        </Button>
       <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={categories} />
+        <DataTable columns={columns} data={categories} onCreate={handleCreate}/>
         <CategoryDialog
         key={dialogMode === "edit" ? editingCategory?.id : "new"} // 👈 forces remount on mode/category change
         mode={dialogMode}
@@ -113,6 +142,29 @@ const Categories = () => {
         onOpenChange={setIsDialogOpen}
         onSuccess={handleDialogSuccess}
       />
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the category{" "}
+              <span className="font-medium">
+                &quot;{deletingCategory?.name}&quot;
+              </span>{" "}
+              and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </div>
     </div>
   );

@@ -28,11 +28,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onCreate?: () => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onCreate,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -66,7 +68,12 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <Button>Create</Button>
+        {/* 👇 Conditionally render Create button if onCreate is passed */}
+        {onCreate && (
+          <Button onClick={onCreate}>
+            Create
+          </Button>
+        )}
       </div>
     <div className="overflow-hidden rounded-md border">
       <Table>
