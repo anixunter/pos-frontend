@@ -59,6 +59,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
+    {/* 👇 Toolbar with filter + Create button */}
     <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter names..."
@@ -75,6 +76,7 @@ export function DataTable<TData, TValue>({
           </Button>
         )}
       </div>
+    {/* Table */}
     <div className="overflow-hidden rounded-md border">
       <Table>
         <TableHeader>
@@ -120,6 +122,7 @@ export function DataTable<TData, TValue>({
       </Table>
     </div>
     <div className="flex items-center justify-end space-x-2 py-4">
+        {/* Visibility */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -148,6 +151,7 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        {/* Pagination */}
         <Button
           variant="outline"
           size="sm"
