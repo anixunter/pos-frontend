@@ -30,6 +30,10 @@ const columns: ColumnDef<PriceHistoryEntry>[] = [
   {
     accessorKey: "effective_date",
     header: "Effective Date",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("effective_date"));
+      return date.toLocaleString();
+    },
   },
   {
     accessorKey: "purchase_order",
