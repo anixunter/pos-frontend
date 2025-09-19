@@ -34,6 +34,7 @@ interface ProductState {
   updateProduct: (id: string, productData: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   clearError: () => void;
+  reset: () => void;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
@@ -152,4 +153,12 @@ export const useProductStore = create<ProductState>((set) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  reset: () =>
+    set({
+      products: [],
+      currentProduct: null,
+      isLoading: false,
+      error: null,
+    }),
 }));

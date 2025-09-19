@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { useSupplierStore } from "@/stores/supplierStore";
+import { useSupplierStore, type Supplier } from "@/stores/supplierStore";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { SupplierDialog } from "./SupplierDialog";
-import type { Supplier } from "@/stores/supplierStore";
 
 type DialogMode = "create" | "edit";
 

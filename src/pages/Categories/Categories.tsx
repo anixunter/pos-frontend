@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { useCategoryStore } from "@/stores/categoryStore";
+import { useCategoryStore, type Category } from "@/stores/categoryStore";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { CategoryDialog } from "./CategoryDialog";
-import type { Category } from "@/stores/categoryStore";
 
 type DialogMode = "create" | "edit";
 

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,8 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useProductStore, type Product } from "@/stores/productStore";
-import { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -21,9 +20,18 @@ import {
 } from "@/components/ui/form";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Select from "react-select";
+import { useProductStore, type Product } from "@/stores/productStore";
+import { useCategoryStore, type Category } from "@/stores/categoryStore";
+import { useSupplierStore, type Supplier } from "@/stores/supplierStore";
 import { productSchema, type ProductFormData } from "@/lib/zod/productSchema";
 
 type DialogMode = "create" | "edit";
+
+// type SelectOption = {
+//   value: string;
+//   label: string;
+// };
 
 interface ProductDialogProps {
   mode: DialogMode;
@@ -41,6 +49,8 @@ export function ProductDialog({
   onSuccess,
 }: ProductDialogProps) {
   const { createProduct, updateProduct } = useProductStore();
+  const { categories, fetchCategories } = useCategoryStore();
+  const { suppliers, fetchSuppliers } = useSupplierStore();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema) as Resolver<ProductFormData>,
@@ -50,9 +60,7 @@ export function ProductDialog({
       sku: "",
       barcode: "",
       category: "",
-      category_name: "",
       supplier: "",
-      supplier_name: "",
       purchase_price: 0,
       selling_price: 0,
       current_stock: 0,
@@ -64,20 +72,41 @@ export function ProductDialog({
   // Reset form when dialog opens or mode/product changes
   useEffect(() => {
     if (open) {
+      // Only fetch if categories/suppliers are empty (not loaded yet)
+      if (categories.length === 0) {
+        fetchCategories();
+      }
+      if (suppliers.length === 0) {
+        fetchSuppliers();
+      }
       if (mode === "edit" && product) {
-        form.reset(product); // ✅ RHF + ShadCN handles this perfectly
+        // Ensure category and supplier are strings
+        const sanitizedProduct = {
+          ...product,
+          category: product.category?.toString() || "",
+          supplier: product.supplier?.toString() || "",
+        };
+        form.reset(sanitizedProduct);
       } else {
         form.reset(); //rest to defaultValues
       }
     }
   }, [open, mode, product, form]);
 
-  // const isEdit = mode === "edit";
+  const categoryOptions = categories.map((cat: Category) => ({
+    value: cat.id.toString(),
+    label: cat.name,
+  }));
+
+  const supplierOptions = suppliers.map((sup: Supplier) => ({
+    value: sup.id.toString(),
+    label: sup.name,
+  }));
 
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (mode === "create") {
-        await createProduct(data); // ✅ Type-safe, no casting
+        await createProduct(data);
       } else if (mode === "edit" && product?.id) {
         await updateProduct(product.id, data);
       }
@@ -176,9 +205,21 @@ export function ProductDialog({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category ID</FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. cat_123" {...field} />
+                    <Select
+                      {...field}
+                      options={categoryOptions}
+                      placeholder="Select a category..."
+                      isSearchable
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={
+                        categoryOptions.find(
+                          (option) => option.value === field.value
+                        ) || null
+                      }
+                      classNamePrefix="react-select"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -191,9 +232,21 @@ export function ProductDialog({
               name="supplier"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Supplier ID</FormLabel>
+                  <FormLabel>Supplier</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. sup_456" {...field} />
+                    <Select
+                      {...field}
+                      options={supplierOptions}
+                      placeholder="Select a supplier..."
+                      isSearchable
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={
+                        supplierOptions.find(
+                          (option) => option.value === field.value
+                        ) || null
+                      }
+                      classNamePrefix="react-select"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -5,10 +5,8 @@ export const productSchema = z.object({
   description: z.string().optional(),
   sku: z.string().min(1, { message: "SKU is required" }),
   barcode: z.string().optional(),
-  category: z.string().min(1, { message: "Category ID is required" }),
-  category_name: z.string().optional(),
-  supplier: z.string().min(1, { message: "Supplier ID is required" }),
-  supplier_name: z.string().optional(),
+  category: z.string().min(1, { message: "Category is required" }),
+  supplier: z.string().min(1, { message: "Supplier is required" }),
   purchase_price: z.preprocess(
     (val) => Number(val),
     z.number().min(0, { message: "Must be >= 0" })

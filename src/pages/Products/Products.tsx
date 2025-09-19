@@ -110,6 +110,11 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    return () => {
+      // Optional: reset when component unmounts
+      // Only do this if you want to clear product state when leaving the page
+      useProductStore.getState().reset();
+    };
   }, []);
 
   const handleCreate = () => {
