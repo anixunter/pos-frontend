@@ -44,20 +44,32 @@ const getColumns = (
     },
   },
   {
-    accessorKey: "contact_person",
-    header: "Contact Person",
+    accessorKey: "sku",
+    header: "SKU",
   },
   {
-    accessorKey: "phone",
-    header: "Phone No.",
+    accessorKey: "category_name",
+    header: "Category",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "supplier_name",
+    header: "Supplier",
   },
   {
-    accessorKey: "address",
-    header: "Address",
+    accessorKey: "purchase_price",
+    header: "Purchase Price",
+  },
+  {
+    accessorKey: "selling_price",
+    header: "Selling Price",
+  },
+  {
+    accessorKey: "current_stock",
+    header: "Stock",
+  },
+  {
+    accessorKey: "unit_of_measurement",
+    header: "Unit",
   },
   {
     id: "actions",
