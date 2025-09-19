@@ -21,9 +21,24 @@ export interface Product {
   unit_of_measurement: string;
 }
 
+export interface PriceHistoryEntry {
+  purchase_price: string;
+  effective_date: string;
+  purchase_order: number;
+  quantity_received: string;
+}
+
+export interface ProductPriceHistory {
+  product_id: number;
+  product_name: string;
+  current_purchase_price: number;
+  price_history: PriceHistoryEntry[];
+}
+
 interface ProductState {
   products: Product[];
   currentProduct: Product | null;
+  priceHistory: ProductPriceHistory | null;
   isLoading: boolean;
   error: string | null;
 
@@ -33,6 +48,7 @@ interface ProductState {
   createProduct: (productData: ProductFormData) => Promise<void>;
   updateProduct: (id: string, productData: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
+  fetchPriceHistory: (id: string) => Promise<void>;
   clearError: () => void;
   reset: () => void;
 }
@@ -40,6 +56,7 @@ interface ProductState {
 export const useProductStore = create<ProductState>((set) => ({
   products: [],
   currentProduct: null,
+  priceHistory: null,
   isLoading: false,
   error: null,
 
@@ -152,12 +169,30 @@ export const useProductStore = create<ProductState>((set) => ({
     }
   },
 
+  fetchPriceHistory: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await apiClient.get<ProductPriceHistory>(
+        apiEndpoints.products.price_history(id)
+      );
+      set({ priceHistory: response.data });
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail || "Failed to fetch price history";
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   clearError: () => set({ error: null }),
 
   reset: () =>
     set({
       products: [],
       currentProduct: null,
+      priceHistory: null,
       isLoading: false,
       error: null,
     }),

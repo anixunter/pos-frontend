@@ -1,8 +1,7 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { useProductStore } from "@/stores/productStore";
-import { DataTable } from "@/components/ui/data-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,12 +20,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ProductDialog } from "./ProductDialog";
-import type { Product } from "@/stores/productStore";
+import { PriceHistoryDialog } from "./PriceHistoryDialog";
+import { useProductStore, type Product } from "@/stores/productStore";
 
 type DialogMode = "create" | "edit";
 
 const getColumns = (
   handleEdit: (product: Product) => void,
+  handlePriceHistory: (product: Product) => void,
   handleDelete: (product: Product) => void
 ): ColumnDef<Product>[] => [
   {
@@ -88,6 +89,9 @@ const getColumns = (
             <DropdownMenuItem onClick={() => handleEdit(product)}>
               Edit
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handlePriceHistory(product)}>
+              Price History
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDelete(product)}>
               Delete
             </DropdownMenuItem>
@@ -99,14 +103,23 @@ const getColumns = (
 ];
 
 const Products = () => {
-  const { products, isLoading, error, fetchProducts, deleteProduct } =
-    useProductStore();
+  const {
+    products,
+    isLoading,
+    error,
+    fetchProducts,
+    deleteProduct,
+    fetchPriceHistory,
+    priceHistory,
+  } = useProductStore();
 
   const [dialogMode, setDialogMode] = useState<DialogMode>("edit");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPurchaseHistoryDialogOpen, setIsPriceHistoryDialogOpen] =
+    useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -127,6 +140,12 @@ const Products = () => {
     setDialogMode("edit");
     setEditingProduct(product);
     setIsDialogOpen(true);
+  };
+
+  const handlePriceHistory = (product: Product) => {
+    setIsPriceHistoryDialogOpen(true);
+    // fetch price history
+    fetchPriceHistory(product.id);
   };
 
   const handleDelete = (product: Product) => {
@@ -152,7 +171,7 @@ const Products = () => {
     // fetchProducts()
   };
 
-  const columns = getColumns(handleEdit, handleDelete);
+  const columns = getColumns(handleEdit, handlePriceHistory, handleDelete);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -175,6 +194,11 @@ const Products = () => {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSuccess={handleDialogSuccess}
+        />
+        <PriceHistoryDialog
+          priceHistory={priceHistory}
+          open={isPurchaseHistoryDialogOpen}
+          onOpenChange={setIsPriceHistoryDialogOpen}
         />
         <AlertDialog
           open={isDeleteDialogOpen}

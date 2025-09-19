@@ -317,7 +317,7 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Unit of Measurement</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Piece, Kg, Sq.M" {...field} />
+                    <Input placeholder="e.g. Piece, Kg, Sq.m" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
