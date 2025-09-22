@@ -121,7 +121,7 @@ export function ProductDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         onOpenAutoFocus={(e) => e.preventDefault()}
-        className="max-w-4xl max-h-[90vh] overflow-y-auto"
+        className="!max-w-3xl max-h-[90vh] overflow-y-auto"
       >
         <DialogHeader>
           <DialogTitle>

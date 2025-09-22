@@ -90,7 +90,10 @@ export function AdjustStockDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className="!max-w-xl"
+      >
         <DialogHeader>
           <DialogTitle>Adjust Inventory for {product?.name}</DialogTitle>
           <DialogDescription>

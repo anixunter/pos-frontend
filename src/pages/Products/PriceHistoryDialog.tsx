@@ -49,10 +49,7 @@ export function PriceHistoryDialog({
   const data = priceHistory?.price_history || [];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        className="w-[80vw]! max-w-4xl!"
-      >
+      <DialogContent className="!max-w-3xl">
         <DialogHeader>
           <DialogTitle>
             Price History for {priceHistory?.product_name}
