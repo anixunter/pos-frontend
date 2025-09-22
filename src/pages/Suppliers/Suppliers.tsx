@@ -149,7 +149,7 @@ const Suppliers = () => {
           columns={columns}
           data={suppliers}
           onCreate={handleCreate}
-          onFilter={true}
+          showFilter={true}
         />
         <SupplierDialog
           key={

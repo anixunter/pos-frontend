@@ -34,14 +34,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onCreate?: () => void;
-  onFilter?: boolean;
+  showFilter?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   onCreate,
-  onFilter,
+  showFilter,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
     <>
       {/* 👇 Toolbar with filter + Create button */}
       <div className="flex items-center justify-between py-4">
-        {onFilter && (
+        {showFilter && (
           <Input
             placeholder="Filter names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}

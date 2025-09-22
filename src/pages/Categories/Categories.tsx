@@ -137,7 +137,7 @@ const Categories = () => {
           columns={columns}
           data={categories}
           onCreate={handleCreate}
-          onFilter={true}
+          showFilter={true}
         />
         <CategoryDialog
           key={

@@ -184,7 +184,7 @@ const Products = () => {
           columns={columns}
           data={products}
           onCreate={handleCreate}
-          onFilter={true}
+          showFilter={true}
         />
         <ProductDialog
           key={
