@@ -40,6 +40,7 @@ interface ProductState {
   currentProduct: Product | null;
   priceHistory: ProductPriceHistory | null;
   isLoading: boolean;
+  isPriceHistoryLoading: boolean;
   error: string | null;
 
   // Actions
@@ -58,6 +59,7 @@ export const useProductStore = create<ProductState>((set) => ({
   currentProduct: null,
   priceHistory: null,
   isLoading: false,
+  isPriceHistoryLoading: false,
   error: null,
 
   fetchProducts: async () => {
@@ -170,7 +172,7 @@ export const useProductStore = create<ProductState>((set) => ({
   },
 
   fetchPriceHistory: async (id: string) => {
-    set({ isLoading: true, error: null });
+    set({ isPriceHistoryLoading: true, error: null });
     try {
       const response = await apiClient.get<ProductPriceHistory>(
         apiEndpoints.products.price_history(id)
@@ -182,7 +184,7 @@ export const useProductStore = create<ProductState>((set) => ({
       set({ error: errorMessage });
       toast.error(errorMessage);
     } finally {
-      set({ isLoading: false });
+      set({ isPriceHistoryLoading: false });
     }
   },
 

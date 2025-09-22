@@ -13,6 +13,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import {
   type ProductPriceHistory,
   type PriceHistoryEntry,
+  useProductStore,
 } from "@/stores/productStore";
 
 interface PriceHistoryDialogProps {
@@ -50,6 +51,7 @@ export function PriceHistoryDialog({
   open,
   onOpenChange,
 }: PriceHistoryDialogProps) {
+  const { isPriceHistoryLoading } = useProductStore();
   const data = priceHistory?.price_history || [];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,7 +68,11 @@ export function PriceHistoryDialog({
             <strong>${priceHistory?.current_purchase_price.toFixed(2)}</strong>
           </DialogDescription>
         </DialogHeader>
-        <DataTable columns={columns} data={data} />
+        {isPriceHistoryLoading ? (
+          <div className="flex justify-center py-4">Loading...</div>
+        ) : (
+          <DataTable columns={columns} data={data} />
+        )}
         <DialogFooter>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
         </DialogFooter>
