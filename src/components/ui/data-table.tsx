@@ -35,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onCreate?: () => void;
   showFilter?: boolean;
+  defaultColumnVisibility?: VisibilityState;
 }
 
 export function DataTable<TData, TValue>({
@@ -42,10 +43,13 @@ export function DataTable<TData, TValue>({
   data,
   onCreate,
   showFilter,
+  defaultColumnVisibility,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    defaultColumnVisibility || {}
+  );
 
   const table = useReactTable({
     data,

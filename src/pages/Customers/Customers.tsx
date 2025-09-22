@@ -154,6 +154,7 @@ const Customers = () => {
           data={customers}
           onCreate={handleCreate}
           showFilter={true}
+          defaultColumnVisibility={{ email: false, loyality_points: false }}
         />
         <CustomerDialog
           key={
