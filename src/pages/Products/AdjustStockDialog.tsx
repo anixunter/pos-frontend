@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+import Select from "react-select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,15 +12,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   useProductStore,
   type Product,
   type AdjustProduct,
 } from "@/stores/productStore";
-import { useEffect, useState } from "react";
-import Select from "react-select";
+import {
+  inventoryAdjustmentSchema,
+  type AdjustmentFormData,
+} from "@/lib/zod/inventoryAdjustmentSchema";
 
 interface AdjustStockDialogProps {
   product: Product | null;
@@ -35,30 +48,33 @@ export function AdjustStockDialog({
   open,
   onOpenChange,
 }: AdjustStockDialogProps) {
-  const [adjustment_type, setAdjustment_Type] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [reason, setReason] = useState("");
-
   const { adjustProduct, fetchProducts } = useProductStore();
+
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<AdjustmentFormData>({
+    resolver: zodResolver(inventoryAdjustmentSchema),
+    defaultValues: {
+      adjustment_type: "",
+      quantity: "",
+      reason: "",
+    },
+  });
 
   // Reset form when dialog opens/closes or product changes
   useEffect(() => {
     if (!open) {
-      setAdjustment_Type("");
-      setQuantity("");
-      setReason("");
+      form.reset();
     }
-  }, [open]);
+  }, [open, form]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AdjustmentFormData) => {
     if (!product) return;
 
     try {
       const adjustData: AdjustProduct = {
-        adjustment_type,
-        quantity: Number(quantity),
-        reason,
+        adjustment_type: data.adjustment_type,
+        quantity: Number(data.quantity),
+        reason: data.reason,
       };
 
       await adjustProduct(product.id, adjustData);
@@ -84,65 +100,82 @@ export function AdjustStockDialog({
             </strong>
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="adjustment_type">Adjustment Type</Label>
-              <div className="col-span-3">
-                <Select
-                  id="adjustment_type"
-                  options={adjustmentTypeOptions}
-                  placeholder="Select adjustment type..."
-                  isSearchable={false}
-                  onChange={(option) => setAdjustment_Type(option?.value || "")}
-                  value={
-                    adjustmentTypeOptions.find(
-                      (option) => option.value === adjustment_type
-                    ) || null
-                  }
-                  classNamePrefix="react-select"
-                />
-              </div>
-            </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="adjustment_type"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel>Adjustment Type</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Select
+                      options={adjustmentTypeOptions}
+                      placeholder="Select adjustment type..."
+                      isSearchable={false}
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={
+                        adjustmentTypeOptions.find(
+                          (option) => option.value === field.value
+                        ) || null
+                      }
+                      classNamePrefix="react-select"
+                      onBlur={field.onBlur}
+                    />
+                  </FormControl>
+                  <FormMessage className="col-start-2 col-span-3" />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="quantity">Quantity</Label>
-              <div className="col-span-3">
-                <Input
-                  id="quantity"
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="Enter quantity"
-                  required
-                />
-              </div>
-            </div>
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="Enter quantity"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="col-start-2 col-span-3" />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="reason">Reason</Label>
-              <Textarea
-                id="reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter reason for adjustment"
-                required
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Save Changes</Button>
-          </DialogFooter>
-        </form>
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel>Reason</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Textarea
+                      placeholder="Enter reason for adjustment"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="col-start-2 col-span-3" />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
