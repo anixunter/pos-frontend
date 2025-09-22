@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ProductDialog } from "./ProductDialog";
 import { PriceHistoryDialog } from "./PriceHistoryDialog";
+import { AdjustStockDialog } from "./AdjustStockDialog";
 import { useProductStore, type Product } from "@/stores/productStore";
 
 type DialogMode = "create" | "edit";
@@ -28,6 +29,7 @@ type DialogMode = "create" | "edit";
 const getColumns = (
   handleEdit: (product: Product) => void,
   handlePriceHistory: (product: Product) => void,
+  adjustStock: (product: Product) => void,
   handleDelete: (product: Product) => void
 ): ColumnDef<Product>[] => [
   {
@@ -92,6 +94,9 @@ const getColumns = (
             <DropdownMenuItem onClick={() => handlePriceHistory(product)}>
               Price History
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => adjustStock(product)}>
+              Adjust Stock
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDelete(product)}>
               Delete
             </DropdownMenuItem>
@@ -119,6 +124,10 @@ const Products = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPriceHistoryDialogOpen, setIsPriceHistoryDialogOpen] =
     useState(false);
+  const [adjustingProduct, setAdjustingProduct] = useState<Product | null>(
+    null
+  );
+  const [isAdjustStockDialogOpen, setIsAdjustStockDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -147,6 +156,11 @@ const Products = () => {
     fetchPriceHistory(product.id);
   };
 
+  const adjustStock = (product: Product) => {
+    setAdjustingProduct(product);
+    setIsAdjustStockDialogOpen(true);
+  };
+
   const handleDelete = (product: Product) => {
     setDeletingProduct(product);
     setIsDeleteDialogOpen(true);
@@ -170,7 +184,12 @@ const Products = () => {
     // fetchProducts()
   };
 
-  const columns = getColumns(handleEdit, handlePriceHistory, handleDelete);
+  const columns = getColumns(
+    handleEdit,
+    handlePriceHistory,
+    adjustStock,
+    handleDelete
+  );
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -202,6 +221,11 @@ const Products = () => {
         <PriceHistoryDialog
           open={isPriceHistoryDialogOpen}
           onOpenChange={setIsPriceHistoryDialogOpen}
+        />
+        <AdjustStockDialog
+          product={adjustingProduct}
+          open={isAdjustStockDialogOpen}
+          onOpenChange={setIsAdjustStockDialogOpen}
         />
         <AlertDialog
           open={isDeleteDialogOpen}

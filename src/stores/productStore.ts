@@ -35,6 +35,12 @@ export interface ProductPriceHistory {
   price_history: PriceHistoryEntry[];
 }
 
+export interface AdjustProduct {
+  adjustment_type: string;
+  quantity: number;
+  reason: string;
+}
+
 interface ProductState {
   products: Product[];
   currentProduct: Product | null;
@@ -50,6 +56,7 @@ interface ProductState {
   updateProduct: (id: string, productData: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   fetchPriceHistory: (id: string) => Promise<void>;
+  adjustProduct: (id: string, adjustData: AdjustProduct) => Promise<void>;
   clearError: () => void;
   reset: () => void;
 }
@@ -188,6 +195,25 @@ export const useProductStore = create<ProductState>((set) => ({
     }
   },
 
+  adjustProduct: async (id, adjustData) => {
+    set({ error: null });
+    try {
+      await apiClient.post<Product>(
+        apiEndpoints.products.adjust_stock(id),
+        adjustData
+      );
+      // products are fetched again after calling this method to get fresh products data
+      toast.success("Product adjusted successfully!");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail || "Failed to adjust product";
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      // if something requires later
+    }
+  },
+
   clearError: () => set({ error: null }),
 
   reset: () =>
@@ -196,6 +222,7 @@ export const useProductStore = create<ProductState>((set) => ({
       currentProduct: null,
       priceHistory: null,
       isLoading: false,
+      isPriceHistoryLoading: false,
       error: null,
     }),
 }));
