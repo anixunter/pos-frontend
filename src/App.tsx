@@ -6,7 +6,7 @@ import AuthLayout from "@/layouts/AuthLayout";
 import Login from "@/pages/Login";
 import Sales from "@/pages/Sales";
 import Returns from "@/pages/Returns";
-import Customers from "@/pages/Customers";
+import Customers from "@/pages/Customers/Customers";
 import Deposits from "@/pages/Deposits";
 import InventoryAdjustment from "@/pages/InventoryAdjustment";
 import PurchaseOrders from "@/pages/PurchaseOrders";

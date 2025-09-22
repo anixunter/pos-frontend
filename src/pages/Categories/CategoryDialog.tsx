@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,9 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useCategoryStore } from "@/stores/categoryStore";
-import type { Category } from "@/stores/categoryStore";
-import { useEffect, useState } from "react";
+import { useCategoryStore, type Category } from "@/stores/categoryStore";
 
 type DialogMode = "create" | "edit";
 
