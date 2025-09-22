@@ -110,7 +110,6 @@ const Products = () => {
     fetchProducts,
     deleteProduct,
     fetchPriceHistory,
-    priceHistory,
   } = useProductStore();
 
   const [dialogMode, setDialogMode] = useState<DialogMode>("edit");
@@ -201,7 +200,6 @@ const Products = () => {
           onSuccess={handleDialogSuccess}
         />
         <PriceHistoryDialog
-          priceHistory={priceHistory}
           open={isPriceHistoryDialogOpen}
           onOpenChange={setIsPriceHistoryDialogOpen}
         />

@@ -10,14 +10,9 @@ import {
 // import { ArrowUpDown } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  type ProductPriceHistory,
-  type PriceHistoryEntry,
-  useProductStore,
-} from "@/stores/productStore";
+import { type PriceHistoryEntry, useProductStore } from "@/stores/productStore";
 
 interface PriceHistoryDialogProps {
-  priceHistory: ProductPriceHistory | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -47,11 +42,10 @@ const columns: ColumnDef<PriceHistoryEntry>[] = [
 ];
 
 export function PriceHistoryDialog({
-  priceHistory,
   open,
   onOpenChange,
 }: PriceHistoryDialogProps) {
-  const { isPriceHistoryLoading } = useProductStore();
+  const { priceHistory, isPriceHistoryLoading } = useProductStore();
   const data = priceHistory?.price_history || [];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
