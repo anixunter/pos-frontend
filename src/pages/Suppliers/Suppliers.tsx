@@ -145,7 +145,12 @@ const Suppliers = () => {
     <div>
       <h2 className="text-2xl font-semibold mb-4">Suppliers Management</h2>
       <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={suppliers} onCreate={handleCreate} />
+        <DataTable
+          columns={columns}
+          data={suppliers}
+          onCreate={handleCreate}
+          onFilter={true}
+        />
         <SupplierDialog
           key={
             isDialogOpen

@@ -180,7 +180,12 @@ const Products = () => {
     <div>
       <h2 className="text-2xl font-semibold mb-4">Products Management</h2>
       <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={products} onCreate={handleCreate} />
+        <DataTable
+          columns={columns}
+          data={products}
+          onCreate={handleCreate}
+          onFilter={true}
+        />
         <ProductDialog
           key={
             isDialogOpen
