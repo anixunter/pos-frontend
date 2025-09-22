@@ -118,7 +118,7 @@ const Products = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isPurchaseHistoryDialogOpen, setIsPriceHistoryDialogOpen] =
+  const [isPriceHistoryDialogOpen, setIsPriceHistoryDialogOpen] =
     useState(false);
 
   useEffect(() => {
@@ -202,7 +202,7 @@ const Products = () => {
         />
         <PriceHistoryDialog
           priceHistory={priceHistory}
-          open={isPurchaseHistoryDialogOpen}
+          open={isPriceHistoryDialogOpen}
           onOpenChange={setIsPriceHistoryDialogOpen}
         />
         <AlertDialog
