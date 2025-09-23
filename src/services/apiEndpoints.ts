@@ -21,7 +21,7 @@ export const apiEndpoints = {
     update: (id: string) => `${API_BASE_URL}/customers/${id}/`,
     delete: (id: string) => `${API_BASE_URL}/customers/${id}/`,
     purchase_history: (id: string) =>
-      `${API_BASE_URL}/customers/${id}/purhcase_history/`,
+      `${API_BASE_URL}/customers/${id}/purchase_history/`,
     return_history: (id: string) =>
       `${API_BASE_URL}/customers/${id}/return_history/`,
     balance_summary: (id: string) =>

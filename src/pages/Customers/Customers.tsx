@@ -21,11 +21,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { CustomerDialog } from "./CustomerDialog";
+import { PurchaseHistorySheet } from "./PurchaseHistorySheet";
 
 type DialogMode = "create" | "edit";
 
 const getColumns = (
   handleEdit: (customer: Customer) => void,
+  handlePurchaseHistory: (customer: Customer) => void,
   handleDelete: (customer: Customer) => void
 ): ColumnDef<Customer>[] => [
   {
@@ -79,6 +81,9 @@ const getColumns = (
             <DropdownMenuItem onClick={() => handleEdit(customer)}>
               Edit
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handlePurchaseHistory(customer)}>
+              Purchase History
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDelete(customer)}>
               Delete
             </DropdownMenuItem>
@@ -90,8 +95,14 @@ const getColumns = (
 ];
 
 const Customers = () => {
-  const { customers, isLoading, error, fetchCustomers, deleteCustomer } =
-    useCustomerStore();
+  const {
+    customers,
+    isLoading,
+    error,
+    fetchCustomers,
+    deleteCustomer,
+    fetchPurchaseHistory,
+  } = useCustomerStore();
 
   const [dialogMode, setDialogMode] = useState<DialogMode>("edit");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -100,9 +111,17 @@ const Customers = () => {
     null
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedPurchaseHistoryCustomer, setSelectedPurchaseHistoryCustomer] =
+    useState<Customer | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
+    return () => {
+      // Optional: reset when component unmounts
+      // Only do this if you want to clear customer state when leaving the page
+      useCustomerStore.getState().reset();
+    };
   }, []);
 
   const handleCreate = () => {
@@ -115,6 +134,12 @@ const Customers = () => {
     setDialogMode("edit");
     setEditingCustomer(customer);
     setIsDialogOpen(true);
+  };
+
+  const handlePurchaseHistory = (customer: Customer) => {
+    setSelectedPurchaseHistoryCustomer(customer);
+    setIsSheetOpen(true);
+    fetchPurchaseHistory(customer.id);
   };
 
   const handleDelete = (customer: Customer) => {
@@ -140,7 +165,7 @@ const Customers = () => {
     // fetchCustomers()
   };
 
-  const columns = getColumns(handleEdit, handleDelete);
+  const columns = getColumns(handleEdit, handlePurchaseHistory, handleDelete);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -169,6 +194,11 @@ const Customers = () => {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSuccess={handleDialogSuccess}
+        />
+        <PurchaseHistorySheet
+          customer={selectedPurchaseHistoryCustomer}
+          isOpen={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
         />
         <AlertDialog
           open={isDeleteDialogOpen}

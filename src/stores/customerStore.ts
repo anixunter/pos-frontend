@@ -13,9 +13,101 @@ export interface Customer {
   outstanding_balance?: number;
 }
 
+export interface PurchaseItem {
+  id: string;
+  product: number;
+  product_name: string;
+  quantity: string;
+  unit_price: string;
+  discount_amount: string;
+  total_price: string;
+}
+
+export interface ReturnItem {
+  id: string;
+  product: number;
+  product_name: string;
+  quantity: string;
+  unit_price: string;
+  total_price: string;
+}
+
+export interface PurchaseReturn {
+  id: string;
+  transaction: number;
+  return_date: string;
+  reason: string;
+  refund_amount: string;
+  refund_method: string;
+  notes: string;
+  items: ReturnItem[];
+}
+
+export interface PurchaseTransaction {
+  id: string;
+  customer: number;
+  customer_name: string;
+  transaction_date: string;
+  payment_method: string;
+  subtotal: string;
+  discount_amount: string;
+  tax_amount: string;
+  total_amount: string;
+  amount_paid: string;
+  change_amount: string;
+  notes: string;
+  items: PurchaseItem[];
+  returns: PurchaseReturn[];
+}
+
+export type CustomerPurchaseHistory = PurchaseTransaction[];
+
+// export interface CustomerPurchaseHistory {
+//   id: string;
+//   customer: number;
+//   customer_name: string;
+//   transaction_date: string;
+//   payment_method: string;
+//   subtotal: string;
+//   discount_amount: string;
+//   tax_amount: string;
+//   total_amount: string;
+//   amount_paid: string;
+//   change_amount: string;
+//   notes: string;
+//   items: {
+//     id: string;
+//     product: number;
+//     product_name: string;
+//     quantity: string;
+//     unit_price: string;
+//     discount_amount: string;
+//     total_price: string;
+//   }[];
+//   returns: {
+//     id: string;
+//     transaction: number;
+//     return_date: string;
+//     reason: string;
+//     refund_amount: string;
+//     refund_method: string;
+//     notes: string;
+//     items: {
+//       id: string;
+//       product: number;
+//       product_name: string;
+//       quantity: string;
+//       unit_price: string;
+//       total_price: string;
+//     }[];
+//   }[];
+// }[];
+
 interface CustomerState {
   customers: Customer[];
   currentCustomer: Customer | null;
+  purchaseHistory: CustomerPurchaseHistory | null;
+  isPurchaseHistoryLoading: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -28,6 +120,7 @@ interface CustomerState {
     customerData: Partial<Customer>
   ) => Promise<void>;
   deleteCustomer: (id: string) => Promise<void>;
+  fetchPurchaseHistory: (id: string) => Promise<void>;
   clearError: () => void;
   reset: () => void;
 }
@@ -35,6 +128,8 @@ interface CustomerState {
 export const useCustomerStore = create<CustomerState>((set) => ({
   customers: [],
   currentCustomer: null,
+  purchaseHistory: null,
+  isPurchaseHistoryLoading: false,
   isLoading: false,
   error: null,
 
@@ -147,12 +242,31 @@ export const useCustomerStore = create<CustomerState>((set) => ({
     }
   },
 
+  fetchPurchaseHistory: async (id: string) => {
+    set({ isPurchaseHistoryLoading: true, error: null });
+    try {
+      const response = await apiClient.get<CustomerPurchaseHistory>(
+        apiEndpoints.customers.purchase_history(id)
+      );
+      set({ purchaseHistory: response.data });
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail || "Failed to fetch purchase history";
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      set({ isPurchaseHistoryLoading: false });
+    }
+  },
+
   clearError: () => set({ error: null }),
 
   reset: () =>
     set({
       customers: [],
       currentCustomer: null,
+      purchaseHistory: null,
+      isPurchaseHistoryLoading: false,
       isLoading: false,
       error: null,
     }),
