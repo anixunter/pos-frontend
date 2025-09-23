@@ -41,6 +41,10 @@ const getColumns = (
         </Button>
       );
     },
+    meta: {
+      filterable: true,
+      filterLabel: "Category Name",
+    },
   },
   {
     accessorKey: "description",

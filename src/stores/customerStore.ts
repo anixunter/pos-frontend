@@ -62,47 +62,6 @@ export interface PurchaseTransaction {
 
 export type CustomerPurchaseHistory = PurchaseTransaction[];
 
-// export interface CustomerPurchaseHistory {
-//   id: string;
-//   customer: number;
-//   customer_name: string;
-//   transaction_date: string;
-//   payment_method: string;
-//   subtotal: string;
-//   discount_amount: string;
-//   tax_amount: string;
-//   total_amount: string;
-//   amount_paid: string;
-//   change_amount: string;
-//   notes: string;
-//   items: {
-//     id: string;
-//     product: number;
-//     product_name: string;
-//     quantity: string;
-//     unit_price: string;
-//     discount_amount: string;
-//     total_price: string;
-//   }[];
-//   returns: {
-//     id: string;
-//     transaction: number;
-//     return_date: string;
-//     reason: string;
-//     refund_amount: string;
-//     refund_method: string;
-//     notes: string;
-//     items: {
-//       id: string;
-//       product: number;
-//       product_name: string;
-//       quantity: string;
-//       unit_price: string;
-//       total_price: string;
-//     }[];
-//   }[];
-// }[];
-
 interface CustomerState {
   customers: Customer[];
   currentCustomer: Customer | null;

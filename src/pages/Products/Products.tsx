@@ -45,6 +45,10 @@ const getColumns = (
         </Button>
       );
     },
+    meta: {
+      filterable: true,
+      filterLabel: "Product Name",
+    },
   },
   {
     accessorKey: "sku",

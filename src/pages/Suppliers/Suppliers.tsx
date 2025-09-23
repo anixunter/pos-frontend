@@ -41,6 +41,10 @@ const getColumns = (
         </Button>
       );
     },
+    meta: {
+      filterable: true,
+      filterLabel: "Supplier Name",
+    },
   },
   {
     accessorKey: "contact_person",
@@ -150,6 +154,7 @@ const Suppliers = () => {
           data={suppliers}
           onCreate={handleCreate}
           showFilter={true}
+          defaultColumnVisibility={{ email: false }}
         />
         <SupplierDialog
           key={

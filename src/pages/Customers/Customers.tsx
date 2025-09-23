@@ -43,10 +43,18 @@ const getColumns = (
         </Button>
       );
     },
+    meta: {
+      filterable: true,
+      filterLabel: "Customer Name",
+    },
   },
   {
     accessorKey: "phone",
     header: "Phone No.",
+    meta: {
+      filterable: true,
+      filterLabel: "Phone Number",
+    },
   },
   {
     accessorKey: "email",
@@ -55,6 +63,9 @@ const getColumns = (
   {
     accessorKey: "address",
     header: "Address",
+    meta: {
+      filterable: true,
+    },
   },
   {
     accessorKey: "loyality_points",

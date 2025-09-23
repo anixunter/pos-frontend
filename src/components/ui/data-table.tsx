@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import Select from "react-select";
 import type {
   ColumnDef,
   SortingState,
@@ -22,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -51,6 +53,22 @@ export function DataTable<TData, TValue>({
     defaultColumnVisibility || {}
   );
 
+  // Auto-generate filterable columns from column definitions
+  const filterableColumns = useMemo(() => {
+    return columns
+      .filter((column: any) => column.meta?.filterable)
+      .map((column: any) => {
+        return {
+          value: column.accessorKey,
+          label: column.meta?.filterLabel || column.header,
+        };
+      });
+  }, [columns]);
+
+  const [selectedFilterColumn, setSelectedFilterColumn] = useState<
+    string | null
+  >(null);
+
   const table = useReactTable({
     data,
     columns,
@@ -70,19 +88,72 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      {/* 👇 Toolbar with filter + Create button */}
-      <div className="flex items-center justify-between py-4">
-        {showFilter && (
-          <Input
-            placeholder="Filter names..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
+      {/* Toolbar with filter + Create button */}
+      <div className="flex items-center justify-between py-2">
+        {showFilter && filterableColumns.length > 0 && (
+          <div className="flex items-center gap-2">
+            {/* Filter Selector */}
+            <Select
+              value={
+                selectedFilterColumn
+                  ? filterableColumns.find(
+                      (opt) => opt.value === selectedFilterColumn
+                    )
+                  : null
+              }
+              onChange={(option) => {
+                // Clear filter on the previously selected column, if any
+                if (selectedFilterColumn) {
+                  table.getColumn(selectedFilterColumn)?.setFilterValue("");
+                }
+                // Update state
+                if (!option || option.value === "") {
+                  setSelectedFilterColumn(null);
+                } else {
+                  setSelectedFilterColumn(option.value);
+                }
+              }}
+              options={filterableColumns}
+              placeholder="Search by..."
+              isSearchable={false}
+              className="w-[200px]"
+            />
+            {/* Filter Input */}
+            {selectedFilterColumn && (
+              <div className="flex items-center gap-1">
+                <Input
+                  placeholder={`Search ${
+                    filterableColumns.find(
+                      (c) => c.value === selectedFilterColumn
+                    )?.label || ""
+                  }...`}
+                  value={
+                    (table
+                      .getColumn(selectedFilterColumn)
+                      ?.getFilterValue() as string) ?? ""
+                  }
+                  onChange={(event) =>
+                    table
+                      .getColumn(selectedFilterColumn)
+                      ?.setFilterValue(event.target.value)
+                  }
+                  className="w-[250px]"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    table.getColumn(selectedFilterColumn)?.setFilterValue("")
+                  }
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         )}
-        {/* 👇 Conditionally render Create button if onCreate is passed */}
+        {/* Create button */}
         {onCreate && <Button onClick={onCreate}>Create</Button>}
       </div>
       {/* Table */}
