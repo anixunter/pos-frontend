@@ -36,7 +36,7 @@ export function PurchaseHistoryCard({ transaction }: PurchaseHistoryCardProps) {
           <div className="text-right text-sm space-y-1">
             <div>
               <span className="font-medium">Total Paid:</span>{" "}
-              <span className="font-bold">₹{transaction.total_amount}</span>
+              <span className="font-bold">₹{transaction.amount_paid}</span>
             </div>
             <div>
               <span>Method:</span> {transaction.payment_method}
