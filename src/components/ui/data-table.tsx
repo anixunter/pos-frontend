@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
 
   const [selectedFilterColumn, setSelectedFilterColumn] = useState<
     string | null
-  >(null);
+  >(filterableColumns[0].value);
 
   const table = useReactTable({
     data,
@@ -137,7 +137,7 @@ export function DataTable<TData, TValue>({
                       .getColumn(selectedFilterColumn)
                       ?.setFilterValue(event.target.value)
                   }
-                  className="w-[250px]"
+                  className="w-[300px]"
                 />
                 <Button
                   variant="ghost"
