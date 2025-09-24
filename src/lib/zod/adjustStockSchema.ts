@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-export const inventoryAdjustmentSchema = z.object({
-  product: z.string().min(1, { message: "Product is required" }),
+export const adjustStockSchema = z.object({
   adjustment_type: z.string().min(1, "Adjustment type is required"),
   quantity: z
     .string()
@@ -13,6 +12,4 @@ export const inventoryAdjustmentSchema = z.object({
   reason: z.string().min(1, { message: "Reason is required" }),
 });
 
-export type InventoryAdjustmentFormData = z.infer<
-  typeof inventoryAdjustmentSchema
->;
+export type AdjustmentFormData = z.infer<typeof adjustStockSchema>;

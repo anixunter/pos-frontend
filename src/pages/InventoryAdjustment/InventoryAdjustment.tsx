@@ -1,6 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { useCategoryStore, type Category } from "@/stores/categoryStore";
+import {
+  useInventoryAdjustmentStore,
+  type InventoryAdjustment,
+} from "@/stores/inventoryAdjustmentStore";
 import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,16 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CategoryDialog } from "./CategoryDialog";
-
-type DialogMode = "create" | "edit";
+import { InventoryAdjustmentDialog } from "./InventoryAdjustmentDialog";
 
 const getColumns = (
-  handleEdit: (category: Category) => void,
-  handleDelete: (category: Category) => void
-): ColumnDef<Category>[] => [
+  handleDelete: (inventoryAdjustment: InventoryAdjustment) => void
+): ColumnDef<InventoryAdjustment>[] => [
   {
-    accessorKey: "name",
+    accessorKey: "product_name",
     header: ({ column }) => {
       return (
         <Button
@@ -43,17 +43,33 @@ const getColumns = (
     },
     meta: {
       filterable: true,
-      filterLabel: "Category Name",
+      filterLabel: "Product Name",
     },
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "adjustment_type",
+    header: "Type",
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+  },
+  {
+    accessorKey: "reason",
+    header: "Reason",
+  },
+  {
+    accessorKey: "adjustment_date",
+    header: "Date",
+  },
+  {
+    accessorKey: "adjusted_by",
+    header: "Adjusted By",
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const category = row.original;
+      const inventoryAdjustment = row.original;
 
       return (
         <DropdownMenu>
@@ -64,10 +80,7 @@ const getColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleEdit(category)}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDelete(category)}>
+            <DropdownMenuItem onClick={() => handleDelete(inventoryAdjustment)}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -77,85 +90,60 @@ const getColumns = (
   },
 ];
 
-const Categories = () => {
-  const { categories, error, fetchCategories, deleteCategory } =
-    useCategoryStore();
+const InventoryAdjustments = () => {
+  const { inventoryAdjustments, error, fetchInventoryAdjustments } =
+    useInventoryAdjustmentStore();
 
-  const [dialogMode, setDialogMode] = useState<DialogMode>("edit");
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<Category | null>(
-    null
-  );
+  const [deletingInventoryAdjustment, setDeletingInventoryAdjustment] =
+    useState<InventoryAdjustment | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
+    fetchInventoryAdjustments();
   }, []);
 
   const handleCreate = () => {
-    setDialogMode("create");
-    // setEditingCategory(null)
+    // setEditingInventoryAdjustment(null)
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (category: Category) => {
-    setDialogMode("edit");
-    setEditingCategory(category);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (category: Category) => {
-    setDeletingCategory(category);
+  const handleDelete = (inventoryAdjustment: InventoryAdjustment) => {
+    setDeletingInventoryAdjustment(inventoryAdjustment);
     setIsDeleteDialogOpen(true);
   };
   const confirmDelete = async () => {
-    if (!deletingCategory) return;
+    if (!deletingInventoryAdjustment) return;
 
     try {
-      await deleteCategory(deletingCategory.id); // ← your store function
+      // await deleteInventoryAdjustment(deletingInventoryAdjustment.id);
+      // inventory adjustment shouldn't be deleted
     } catch (error) {
-      console.error("Failed to delete category", error);
+      console.error("Failed to delete inventoryAdjustment", error);
     } finally {
       setIsDeleteDialogOpen(false);
-      setDeletingCategory(null);
+      setDeletingInventoryAdjustment(null);
     }
   };
 
-  const handleDialogSuccess = () => {
-    setEditingCategory(null);
-    // Optionally: refetch categories if needed
-    // fetchCategories()
-  };
-
-  const columns = getColumns(handleEdit, handleDelete);
+  const columns = getColumns(handleDelete);
 
   // if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4">Categories Management</h2>
+      <h2 className="text-2xl font-semibold mb-4">InventoryAdjustments</h2>
       <div className="container mx-auto py-10">
         <DataTable
           columns={columns}
-          data={categories}
+          data={inventoryAdjustments}
           onCreate={handleCreate}
           showFilter={true}
         />
-        <CategoryDialog
-          key={
-            isDialogOpen
-              ? dialogMode === "edit"
-                ? editingCategory?.id || "edit"
-                : "create"
-              : "closed"
-          }
-          mode={dialogMode}
-          category={editingCategory}
+        <InventoryAdjustmentDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
-          onSuccess={handleDialogSuccess}
         />
         <AlertDialog
           open={isDeleteDialogOpen}
@@ -164,14 +152,7 @@ const Categories = () => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                category{" "}
-                <span className="font-medium">
-                  &quot;{deletingCategory?.name}&quot;
-                </span>{" "}
-                and remove all associated data.
-              </AlertDialogDescription>
+              <AlertDialogDescription></AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -189,4 +170,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default InventoryAdjustments;

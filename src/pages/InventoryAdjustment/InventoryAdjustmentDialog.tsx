@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Select from "react-select";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,17 +22,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  useProductStore,
-  type Product,
-  type AdjustProduct,
-} from "@/stores/productStore";
-import {
-  adjustStockSchema,
-  type AdjustmentFormData,
-} from "@/lib/zod/adjustStockSchema";
+  inventoryAdjustmentSchema,
+  type InventoryAdjustmentFormData,
+} from "@/lib/zod/inventoryAdjustmentSchema";
+import { useInventoryAdjustmentStore } from "@/stores/inventoryAdjustmentStore";
+import { useProductStore, type Product } from "@/stores/productStore";
 
-interface AdjustStockDialogProps {
-  product: Product | null;
+interface InventoryAdjustmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -43,48 +39,45 @@ const adjustmentTypeOptions = [
   { value: "Decrease", label: "Decrease" },
 ];
 
-export function AdjustStockDialog({
-  product,
+export function InventoryAdjustmentDialog({
   open,
   onOpenChange,
-}: AdjustStockDialogProps) {
-  const { adjustProduct, fetchProducts } = useProductStore();
+}: InventoryAdjustmentDialogProps) {
+  const { createInventoryAdjustment } = useInventoryAdjustmentStore();
+  const { products, fetchProducts } = useProductStore();
 
-  // Initialize form with react-hook-form and zod validation
-  const form = useForm<AdjustmentFormData>({
-    resolver: zodResolver(adjustStockSchema),
+  const form = useForm<InventoryAdjustmentFormData>({
+    resolver: zodResolver(inventoryAdjustmentSchema),
     defaultValues: {
+      product: "",
       adjustment_type: "",
       quantity: "",
       reason: "",
     },
   });
 
-  // Reset form when dialog opens/closes or product changes
+  // Reset form when dialog opens or mode/inventoryAdjustment changes
   useEffect(() => {
-    if (!open) {
-      form.reset();
+    if (open) {
+      // Only fetch if products are empty (not loaded yet)
+      if (products.length === 0) {
+        fetchProducts();
+      }
+      form.reset(); //rest to defaultValues
     }
   }, [open, form]);
 
-  const onSubmit = async (data: AdjustmentFormData) => {
-    if (!product) return;
+  const productOptions = products.map((p: Product) => ({
+    value: p.id.toString(),
+    label: p.name,
+  }));
 
+  const onSubmit = async (data: InventoryAdjustmentFormData) => {
     try {
-      const adjustData: AdjustProduct = {
-        adjustment_type: data.adjustment_type,
-        quantity: Number(data.quantity),
-        reason: data.reason,
-      };
-
-      await adjustProduct(product.id, adjustData);
-      // Close dialog on success
+      await createInventoryAdjustment(data);
       onOpenChange(false);
-      // Get fresh products data after inventory adjustment
-      await fetchProducts();
-    } catch (error) {
-      // Error handling is done in the store, so we don't need to do anything here
-      console.error("Error adjusting product:", error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -95,16 +88,40 @@ export function AdjustStockDialog({
         className="!max-w-xl"
       >
         <DialogHeader>
-          <DialogTitle>Adjust Inventory for {product?.name}</DialogTitle>
+          <DialogTitle>Create Inventory Adjustment</DialogTitle>
           <DialogDescription>
-            Current Stock:{" "}
-            <strong>
-              {product?.current_stock} {product?.unit_of_measurement || ""}
-            </strong>
+            Fill in the details to create an inventory adjustment.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Supplier */}
+            <FormField
+              control={form.control}
+              name="product"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product</FormLabel>
+                  <FormControl>
+                    <Select
+                      {...field}
+                      options={productOptions}
+                      placeholder="Select a supplier..."
+                      isSearchable
+                      onChange={(option) => field.onChange(option?.value || "")}
+                      value={
+                        productOptions.find(
+                          (option) => option.value === field.value
+                        ) || null
+                      }
+                      classNamePrefix="react-select"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Adjustment Type */}
             <FormField
               control={form.control}
               name="adjustment_type"
@@ -130,7 +147,7 @@ export function AdjustStockDialog({
                 </FormItem>
               )}
             />
-
+            {/* Quantity */}
             <FormField
               control={form.control}
               name="quantity"
@@ -149,7 +166,7 @@ export function AdjustStockDialog({
                 </FormItem>
               )}
             />
-
+            {/* Reason */}
             <FormField
               control={form.control}
               name="reason"
@@ -166,16 +183,13 @@ export function AdjustStockDialog({
                 </FormItem>
               )}
             />
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
+            {/* Footer */}
+            <DialogFooter className="md:col-span-2 flex justify-end">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting
+                  ? "Saving..."
+                  : "Create Inventory Adjustment"}
               </Button>
-              <Button type="submit">Save Changes</Button>
             </DialogFooter>
           </form>
         </Form>
