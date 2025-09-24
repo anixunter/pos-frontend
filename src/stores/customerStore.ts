@@ -80,6 +80,7 @@ interface CustomerState {
   ) => Promise<void>;
   deleteCustomer: (id: string) => Promise<void>;
   fetchPurchaseHistory: (id: string) => Promise<void>;
+  payCredit: (id: string, paymentData: any) => Promise<void>;
   clearError: () => void;
   reset: () => void;
 }
@@ -215,6 +216,20 @@ export const useCustomerStore = create<CustomerState>((set) => ({
       toast.error(errorMessage);
     } finally {
       set({ isPurchaseHistoryLoading: false });
+    }
+  },
+
+  payCredit: async (id: string, paymentData: any) => {
+    try {
+      await apiClient.post(apiEndpoints.customers.pay_credit(id), paymentData);
+      // update customers list after payment maybe?
+      toast.success("Credit updated successfully!");
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail || "Failed to update credit";
+      toast.error(errorMessage);
+    } finally {
+      // whatever
     }
   },
 

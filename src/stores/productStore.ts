@@ -196,7 +196,7 @@ export const useProductStore = create<ProductState>((set) => ({
   },
 
   adjustProduct: async (id, adjustData) => {
-    set({ error: null });
+    // set({ error: null });
     try {
       await apiClient.post<Product>(
         apiEndpoints.products.adjust_stock(id),
@@ -207,7 +207,7 @@ export const useProductStore = create<ProductState>((set) => ({
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.detail || "Failed to adjust product";
-      set({ error: errorMessage });
+      // set({ error: errorMessage });
       toast.error(errorMessage);
     } finally {
       // if something requires later

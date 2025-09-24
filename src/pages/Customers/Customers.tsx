@@ -22,11 +22,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CustomerDialog } from "./CustomerDialog";
 import { PurchaseHistorySheet } from "./PurchaseHistorySheet";
+import { PayCreditDialog } from "./PayCreditDialog";
 
 type DialogMode = "create" | "edit";
 
 const getColumns = (
   handleEdit: (customer: Customer) => void,
+  handlePayCredit: (customer: Customer) => void,
   handlePurchaseHistory: (customer: Customer) => void,
   handleDelete: (customer: Customer) => void
 ): ColumnDef<Customer>[] => [
@@ -102,6 +104,9 @@ const getColumns = (
             <DropdownMenuItem onClick={() => handleEdit(customer)}>
               Edit
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handlePayCredit(customer)}>
+              Pay Credit
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handlePurchaseHistory(customer)}>
               Purchase History
             </DropdownMenuItem>
@@ -132,6 +137,9 @@ const Customers = () => {
     null
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [creditPayingCustomer, setCreditPayingCustomer] =
+    useState<Customer | null>(null);
+  const [isPayCreditDialogOpen, setIsPayCreditDialogOpen] = useState(false);
   const [selectedPurchaseHistoryCustomer, setSelectedPurchaseHistoryCustomer] =
     useState<Customer | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -155,6 +163,11 @@ const Customers = () => {
     setDialogMode("edit");
     setEditingCustomer(customer);
     setIsDialogOpen(true);
+  };
+
+  const handlePayCredit = (customer: Customer) => {
+    setCreditPayingCustomer(customer);
+    setIsPayCreditDialogOpen(true);
   };
 
   const handlePurchaseHistory = (customer: Customer) => {
@@ -186,7 +199,12 @@ const Customers = () => {
     // fetchCustomers()
   };
 
-  const columns = getColumns(handleEdit, handlePurchaseHistory, handleDelete);
+  const columns = getColumns(
+    handleEdit,
+    handlePayCredit,
+    handlePurchaseHistory,
+    handleDelete
+  );
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -215,6 +233,11 @@ const Customers = () => {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSuccess={handleDialogSuccess}
+        />
+        <PayCreditDialog
+          customer={creditPayingCustomer}
+          open={isPayCreditDialogOpen}
+          onOpenChange={setIsPayCreditDialogOpen}
         />
         <PurchaseHistorySheet
           customer={selectedPurchaseHistoryCustomer}
