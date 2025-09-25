@@ -99,6 +99,7 @@ export const useInventoryAdjustmentStore = create<InventoryAdjustmentState>(
       }
     },
 
+    // its not used right now
     updateInventoryAdjustment: async (id, inventoryAdjustmentData) => {
       set({ isLoading: true, error: null });
       try {
@@ -133,6 +134,7 @@ export const useInventoryAdjustmentStore = create<InventoryAdjustmentState>(
       }
     },
 
+    //this will also not be used
     deleteInventoryAdjustment: async (id) => {
       set({ isLoading: true, error: null });
       try {

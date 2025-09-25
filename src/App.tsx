@@ -9,7 +9,7 @@ import Returns from "@/pages/Returns";
 import Customers from "@/pages/Customers/Customers";
 import Deposits from "@/pages/Deposits";
 import InventoryAdjustment from "@/pages/InventoryAdjustment/InventoryAdjustment";
-import PurchaseOrders from "@/pages/PurchaseOrders";
+import PurchaseOrders from "@/pages/PurchaseOrders/PurchaseOrders";
 import Products from "@/pages/Products/Products";
 import Suppliers from "@/pages/Suppliers/Suppliers";
 import Categories from "@/pages/Categories/Categories";

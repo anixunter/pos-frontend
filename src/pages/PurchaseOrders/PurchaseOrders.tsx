@@ -1,8 +1,7 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
-import { useCategoryStore, type Category } from "@/stores/categoryStore";
+import type { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,40 +19,47 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CategoryDialog } from "./CategoryDialog";
+import { PurchaseOrderDialog } from "./PurchaseOrderDialog";
+import {
+  usePurchaseOrderStore,
+  type PurchaseOrder,
+} from "@/stores/purchaseOrderStore";
+import { PurchaseOrderForm } from "./PurchaseOrderForm";
 
 type DialogMode = "create" | "edit";
 
 const getColumns = (
-  handleEdit: (category: Category) => void,
-  handleDelete: (category: Category) => void
-): ColumnDef<Category>[] => [
+  handleEdit: (purchaseOrder: PurchaseOrder) => void,
+  handleDelete: (purchaseOrder: PurchaseOrder) => void
+): ColumnDef<PurchaseOrder>[] => [
   {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    meta: {
-      filterable: true,
-      filterLabel: "Category Name",
-    },
+    accessorKey: "id",
+    header: "Id",
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "supplier_name",
+    header: "Supplier",
+  },
+  {
+    accessorKey: "order_date",
+    header: "Date",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "total_amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "notes",
+    header: "Note",
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const category = row.original;
+      const purchaseOrder = row.original;
 
       return (
         <DropdownMenu>
@@ -64,10 +70,10 @@ const getColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleEdit(category)}>
-              Edit
+            <DropdownMenuItem onClick={() => handleEdit(purchaseOrder)}>
+              View
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDelete(category)}>
+            <DropdownMenuItem onClick={() => handleDelete(purchaseOrder)}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -77,87 +83,96 @@ const getColumns = (
   },
 ];
 
-const Categories = () => {
-  const { categories, error, fetchCategories, deleteCategory } =
-    useCategoryStore();
+const PurchaseOrders = () => {
+  const {
+    purchaseOrders,
+    isLoading,
+    error,
+    fetchPurchaseOrders,
+    deletePurchaseOrder,
+  } = usePurchaseOrderStore();
 
   const [dialogMode, setDialogMode] = useState<DialogMode>("edit");
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingPurchaseOrder, setEditingPurchaseOrder] =
+    useState<PurchaseOrder | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<Category | null>(
-    null
-  );
+  const [deletingPurchaseOrder, setDeletingPurchaseOrder] =
+    useState<PurchaseOrder | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
+    fetchPurchaseOrders();
+    return () => {
+      // Optional: reset when component unmounts
+      // Only do this if you want to clear purchaseOrder state when leaving the page
+      usePurchaseOrderStore.getState().reset();
+    };
   }, []);
 
   const handleCreate = () => {
     setDialogMode("create");
-    // setEditingCategory(null)
+    // setEditingPurchaseOrder(null)
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = (purchaseOrder: PurchaseOrder) => {
     setDialogMode("edit");
-    setEditingCategory(category);
+    setEditingPurchaseOrder(purchaseOrder);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (category: Category) => {
-    setDeletingCategory(category);
+  const handleDelete = (purchaseOrder: PurchaseOrder) => {
+    setDeletingPurchaseOrder(purchaseOrder);
     setIsDeleteDialogOpen(true);
   };
   const confirmDelete = async () => {
-    if (!deletingCategory) return;
+    if (!deletingPurchaseOrder) return;
 
     try {
-      await deleteCategory(deletingCategory.id); // ← your store function
+      //   await deletePurchaseOrder(deletingPurchaseOrder.id);
     } catch (error) {
-      console.error("Failed to delete category", error);
+      console.error("Failed to delete purchaseOrder", error);
     } finally {
       setIsDeleteDialogOpen(false);
-      setDeletingCategory(null);
+      setDeletingPurchaseOrder(null);
     }
   };
 
   const handleDialogSuccess = () => {
-    setEditingCategory(null);
-    // Optionally: refetch categories if needed
-    // fetchCategories()
+    setEditingPurchaseOrder(null);
+    // Optionally: refetch purchaseOrders if needed
+    // fetchPurchaseOrders()
   };
 
   const columns = getColumns(handleEdit, handleDelete);
 
-  // if (isLoading) return <div>Loading...</div>;
-  // later figure out how to handle loading
+  if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4">Categories Management</h2>
+      <h2 className="text-2xl font-semibold mb-4">PurchaseOrders Management</h2>
       <div className="container mx-auto py-10">
         <DataTable
           columns={columns}
-          data={categories}
+          data={purchaseOrders}
           onCreate={handleCreate}
-          showFilter={true}
         />
-        <CategoryDialog
+        <PurchaseOrderForm onSubmit={() => {}} />
+        {/* <PurchaseOrderDialog
           key={
             isDialogOpen
               ? dialogMode === "edit"
-                ? editingCategory?.id || "edit"
+                ? editingPurchaseOrder?.id || "edit"
                 : "create"
               : "closed"
           }
           mode={dialogMode}
-          category={editingCategory}
+          purchaseOrder={editingPurchaseOrder}
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSuccess={handleDialogSuccess}
-        />
+        /> */}
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
@@ -167,9 +182,9 @@ const Categories = () => {
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete the
-                category{" "}
+                purchaseOrder{" "}
                 <span className="font-medium">
-                  &quot;{deletingCategory?.name}&quot;
+                  &quot;{deletingPurchaseOrder?.id}&quot;
                 </span>{" "}
                 and remove all associated data.
               </AlertDialogDescription>
@@ -190,4 +205,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default PurchaseOrders;

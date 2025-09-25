@@ -68,13 +68,13 @@ export const apiEndpoints = {
     update: (id: string) => `${API_BASE_URL}/inventory_adjustment/${id}/`,
     delete: (id: string) => `${API_BASE_URL}/inventory_adjustment/${id}/`,
   },
-  purhcase_orders: {
-    get_all: `${API_BASE_URL}/purhcase_orders/`,
+  purchase_orders: {
+    get_all: `${API_BASE_URL}/purchase_orders/`,
     get: (id: string) => `${API_BASE_URL}/purchase_orders/${id}/`,
-    create: `${API_BASE_URL}/purhcase_orders/`,
-    update: (id: string) => `${API_BASE_URL}/purhcase_orders/${id}/`,
-    delete: (id: string) => `${API_BASE_URL}/purhcase_orders/${id}/`,
-    complete: (id: string) => `${API_BASE_URL}/purhcase_orders/${id}/complete/`,
+    create: `${API_BASE_URL}/purchase_orders/`,
+    update: (id: string) => `${API_BASE_URL}/purchase_orders/${id}/`,
+    delete: (id: string) => `${API_BASE_URL}/purchase_orders/${id}/`,
+    complete: (id: string) => `${API_BASE_URL}/purchase_orders/${id}/complete/`,
   },
   sales: {
     get_all: `${API_BASE_URL}/sales/`,
